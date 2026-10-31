@@ -117,8 +117,17 @@ app.get('/api/search', async (req, res) => {
     }
 
     try {
-        const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query.trim())}&limit=5&appid=${API_KEY}`;
-        const response = await axios.get(geoUrl);
+        let cleanQuery = query.trim();
+        let geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cleanQuery)}&limit=5&appid=${API_KEY}`;
+        let response = await axios.get(geoUrl);
+
+        if (!response.data || response.data.length === 0) {
+            const stripped = cleanQuery.replace(/^(kabupaten|kab\.|kota|daerah khusus ibukota|dki)\s+/i, '').trim();
+            if (stripped && stripped !== cleanQuery) {
+                geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(stripped)}&limit=5&appid=${API_KEY}`;
+                response = await axios.get(geoUrl);
+            }
+        }
         
         const suggestions = (response.data || []).map(item => ({
             name: item.local_names?.id || item.name,
@@ -153,8 +162,19 @@ app.post('/api/weather', async (req, res) => {
 
         // 1. Dapatkan Koordinat jika belum ada
         if ((lat === undefined || lon === undefined) && city) {
-            const geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}&limit=1&appid=${API_KEY}`;
-            const geoResponse = await axios.get(geoUrl);
+            let cleanCity = city.trim();
+            let geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cleanCity)}&limit=1&appid=${API_KEY}`;
+            let geoResponse = await axios.get(geoUrl);
+            
+            // Fallback cerdas untuk nama kota Indonesia (misal: "Kabupaten Bandung" -> "Bandung", "Kota Bandung" -> "Bandung")
+            if (!geoResponse.data || geoResponse.data.length === 0) {
+                const stripped = cleanCity.replace(/^(kabupaten|kab\.|kota|daerah khusus ibukota|dki)\s+/i, '').trim();
+                if (stripped && stripped !== cleanCity) {
+                    geoUrl = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(stripped)}&limit=1&appid=${API_KEY}`;
+                    geoResponse = await axios.get(geoUrl);
+                }
+            }
+
             if (!geoResponse.data || geoResponse.data.length === 0) {
                 return res.status(404).json({ error: `Kota "${city}" tidak ditemukan. Coba ketik nama kota lain.` });
             }

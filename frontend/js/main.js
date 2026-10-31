@@ -56,6 +56,13 @@ function setTheme(isDark) {
     docElement.classList.toggle('dark', isDark);
     localStorage.theme = isDark ? 'dark' : 'light';
 
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        themeIcon.className = isDark
+            ? "fas fa-sun text-amber-400 text-base"
+            : "fas fa-moon text-slate-700 text-base";
+    }
+
     // Refresh charts dengan warna tema baru
     if (currentWeatherData?.hourly) {
         renderSMAChart(currentWeatherData.hourly);

@@ -2058,11 +2058,7 @@ body {
   animation: radar-pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
 }
 
-/* OpenLayers Custom Styles & Dark Mode Filter */
-
-.dark #map .ol-layer {
-  filter: invert(100%) hue-rotate(180deg) brightness(88%) contrast(90%);
-}
+/* OpenLayers Custom Styles */
 
 .ol-control button {
   background-color: rgba(15, 23, 42, 0.8) !important;
@@ -2345,14 +2341,6 @@ body {
 .has-\[\:checked\]\:text-white:has(:checked) {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
-}
-
-.dark\:block:is(.dark *) {
-  display: block;
-}
-
-.dark\:hidden:is(.dark *) {
-  display: none;
 }
 
 .dark\:divide-slate-800:is(.dark *) > :not([hidden]) ~ :not([hidden]) {
