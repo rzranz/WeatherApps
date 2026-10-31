@@ -1,0 +1,23 @@
+{
+  "name": "aplikasi-prediksi-cuaca-psd",
+  "version": "2.0.0",
+  "description": "Dashboard Prediksi Cuaca Interaktif & Filter Digital SMA (Pengolahan Sinyal Digital)",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "build:css": "cd frontend && npx tailwindcss -i ./css/input.css -o ./css/style.css"
+  },
+  "keywords": [
+    "weather",
+    "cuaca",
+    "dsp",
+    "psd",
+    "sma",
+    "moving-average",
+    "chartjs",
+    "openlayers"
+  ],
+  "author": "",
+  "license": "ISC"
+}
