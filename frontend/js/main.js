@@ -49,17 +49,11 @@ const quickCityPills = document.querySelectorAll('.quick-city-pill');
 
 // Theme Toggle
 const themeToggleBtn = document.getElementById('theme-toggle');
-const themeIconLight = document.getElementById('theme-icon-light');
-const themeIconDark = document.getElementById('theme-icon-dark');
 const docElement = document.documentElement;
 
 // --- Logika Tema (Dark / Light) ---
 function setTheme(isDark) {
     docElement.classList.toggle('dark', isDark);
-    if (themeIconLight && themeIconDark) {
-        themeIconLight.classList.toggle('hidden', isDark);
-        themeIconDark.classList.toggle('hidden', !isDark);
-    }
     localStorage.theme = isDark ? 'dark' : 'light';
 
     // Refresh charts dengan warna tema baru
@@ -95,9 +89,9 @@ function switchTab(activeId) {
         tab.page.classList.toggle('hidden', !isActive);
 
         if (isActive) {
-            tab.btn.className = "nav-tab-active px-4 py-2 rounded-xl text-sm font-bold bg-cyan-500 text-white shadow-md shadow-cyan-500/25 flex items-center gap-2 transition-all";
+            tab.btn.className = "px-4 py-2.5 rounded-xl text-sm font-bold bg-cyan-500 text-white shadow-md shadow-cyan-500/25 flex items-center gap-2 transition-all";
         } else {
-            tab.btn.className = "nav-tab-inactive px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all";
+            tab.btn.className = "px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all";
         }
     });
 
@@ -239,14 +233,25 @@ if (gpsButton) {
             return;
         }
 
-        gpsButton.classList.add('animate-spin');
+        const gpsIcon = document.getElementById('gps-icon');
+        if (gpsIcon) {
+            gpsIcon.className = "fas fa-circle-notch fa-spin text-sm text-cyan-500";
+        }
+        gpsButton.disabled = true;
+
         navigator.geolocation.getCurrentPosition(
             (pos) => {
-                gpsButton.classList.remove('animate-spin');
+                if (gpsIcon) {
+                    gpsIcon.className = "fas fa-crosshairs text-sm text-slate-500 dark:text-slate-400";
+                }
+                gpsButton.disabled = false;
                 fetchByCoordinates(pos.coords.latitude, pos.coords.longitude);
             },
             (err) => {
-                gpsButton.classList.remove('animate-spin');
+                if (gpsIcon) {
+                    gpsIcon.className = "fas fa-crosshairs text-sm text-slate-500 dark:text-slate-400";
+                }
+                gpsButton.disabled = false;
                 displayError("Tidak dapat mengakses GPS: " + err.message);
             },
             { timeout: 10000, enableHighAccuracy: true }
@@ -352,7 +357,6 @@ if (toggleEma) {
 
 if (smaWindowSelect) {
     smaWindowSelect.addEventListener('change', () => {
-        // Fetch ulang dengan ukuran window filter baru
         handleFetch(currentCityName);
     });
 }

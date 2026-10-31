@@ -29,102 +29,93 @@
     <div class="container mx-auto max-w-7xl px-4 sm:px-6 py-6 space-y-6">
 
         <!-- ========================================== -->
-        <!-- HEADER & FLOATING ISLAND NAV               -->
+        <!-- HEADER & TOP TOOLBAR                       -->
         <!-- ========================================== -->
-        <header class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-3xl glass-panel shadow-lg border border-slate-200/80 dark:border-slate-800/80">
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 sm:p-5 rounded-3xl glass-panel shadow-lg border border-slate-200/80 dark:border-slate-800/80">
             <!-- Brand Logo -->
-            <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center gap-3 group">
-                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 group-hover:scale-105 transition-transform">
-                        <i class="fas fa-satellite-dish text-xl animate-pulse"></i>
+            <a href="/" class="flex items-center gap-3 group flex-shrink-0">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/25 group-hover:scale-105 transition-transform">
+                    <i class="fas fa-satellite-dish text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">METEOPULSE</span>
+                        <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-400/30">PSD v2.0</span>
                     </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">METEOPULSE</span>
-                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-950/80 text-cyan-700 dark:text-cyan-300 border border-cyan-400/30">PSD v2.0</span>
-                        </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Prediksi Cuaca & Filter Digital SMA</p>
-                    </div>
-                </a>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Prediksi Cuaca & Filter Digital SMA</p>
+                </div>
+            </a>
 
-                <!-- Mobile Theme Toggle -->
-                <button id="theme-toggle" class="lg:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-cyan-500 transition-colors">
-                    <i class="fas fa-sun" id="theme-icon-light"></i>
-                    <i class="fas fa-moon hidden" id="theme-icon-dark"></i>
-                </button>
-            </div>
+            <!-- Search Bar Component & Theme Toggle -->
+            <div class="flex items-center gap-2.5 w-full md:w-auto">
+                <!-- Unified Glass Search Bar -->
+                <div class="relative flex-grow md:w-96 flex items-center bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-1.5 shadow-inner focus-within:ring-2 focus-within:ring-cyan-500 focus-within:border-transparent transition-all">
+                    <i class="fas fa-search text-slate-400 pl-3 pr-2 text-sm pointer-events-none"></i>
+                    
+                    <input type="text" id="city-input" placeholder="Cari nama kota..." autocomplete="off"
+                           class="bg-transparent text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none flex-grow py-1">
 
-            <!-- Search & Actions Bar -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 relative">
-                <!-- Search Input Container -->
-                <div class="relative flex-grow sm:w-80">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fas fa-search text-sm"></i>
-                    </div>
-                    <input type="text" id="city-input" placeholder="Cari kota (cth: Bandung, Tokyo)..." autocomplete="off"
-                           class="w-full pl-10 pr-24 py-2.5 rounded-2xl text-sm bg-slate-100/80 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all">
+                    <!-- GPS Button (Graceful Icon Pulse - No windmill spin!) -->
+                    <button id="btn-gps" type="button" title="Gunakan Lokasi Saya (GPS)"
+                            class="p-2 rounded-xl text-slate-500 hover:text-cyan-500 hover:bg-slate-200/80 dark:hover:bg-slate-800 transition-colors flex items-center justify-center flex-shrink-0">
+                        <i id="gps-icon" class="fas fa-crosshairs text-sm"></i>
+                    </button>
 
-                    <!-- GPS / Current Location Button -->
-                    <button id="btn-gps" type="button" title="Gunakan Lokasi GPS Saya"
-                            class="absolute inset-y-1 right-1 px-2.5 rounded-xl text-xs font-semibold bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-950/40 transition-colors flex items-center gap-1.5">
-                        <i class="fas fa-crosshairs"></i>
-                        <span class="hidden md:inline">GPS</span>
+                    <!-- Search Submit Button -->
+                    <button id="fetch-button" type="button"
+                            class="ml-1 px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-white shadow-md shadow-cyan-500/25 active:scale-95 transition-all flex items-center gap-1.5 flex-shrink-0">
+                        <span id="button-text">Cari</span>
+                        <i id="button-icon" class="fas fa-search text-xs"></i>
                     </button>
 
                     <!-- Autocomplete Suggestions Dropdown -->
                     <ul id="autocomplete-list" class="absolute left-0 right-0 top-full mt-2 rounded-2xl glass-panel shadow-2xl border border-slate-200 dark:border-slate-800 hidden overflow-hidden z-50 max-h-60 overflow-y-auto"></ul>
                 </div>
 
-                <!-- Submit Button -->
-                <button id="fetch-button"
-                        class="px-5 py-2.5 rounded-2xl text-sm font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 active:scale-95 transition-all flex items-center justify-center gap-2">
-                    <span id="button-text">Cari Cuaca</span>
-                    <i id="button-spinner" class="fas fa-circle-notch fa-spin hidden"></i>
-                </button>
-
-                <!-- Desktop Theme Toggle -->
-                <button id="theme-toggle" class="hidden lg:flex p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-cyan-500 hover:bg-slate-200 dark:hover:bg-slate-700/60 transition-colors">
-                    <i class="fas fa-sun text-sm" id="theme-icon-light"></i>
-                    <i class="fas fa-moon text-sm hidden" id="theme-icon-dark"></i>
+                <!-- Single Unified Theme Toggle Button -->
+                <button id="theme-toggle" type="button" title="Ganti Tema (Gelap / Terang)"
+                        class="w-11 h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 hover:border-cyan-500/40 active:scale-95 transition-all shadow-sm flex-shrink-0">
+                    <i class="fas fa-sun text-amber-500 hidden dark:block text-base"></i>
+                    <i class="fas fa-moon text-slate-700 block dark:hidden text-base"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Quick City Recommendations Chips -->
-        <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
-            <span class="text-xs font-semibold text-slate-400 flex items-center gap-1 flex-shrink-0">
-                <i class="fas fa-fire text-amber-500"></i> Populer:
-            </span>
-            <button class="quick-city-pill px-3 py-1 rounded-full text-xs font-medium bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-cyan-500 hover:text-white transition-all flex-shrink-0" data-city="Bandung">Bandung</button>
-            <button class="quick-city-pill px-3 py-1 rounded-full text-xs font-medium bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-cyan-500 hover:text-white transition-all flex-shrink-0" data-city="Jakarta">Jakarta</button>
-            <button class="quick-city-pill px-3 py-1 rounded-full text-xs font-medium bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-cyan-500 hover:text-white transition-all flex-shrink-0" data-city="Surabaya">Surabaya</button>
-            <button class="quick-city-pill px-3 py-1 rounded-full text-xs font-medium bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-cyan-500 hover:text-white transition-all flex-shrink-0" data-city="Yogyakarta">Yogyakarta</button>
-            <button class="quick-city-pill px-3 py-1 rounded-full text-xs font-medium bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-cyan-500 hover:text-white transition-all flex-shrink-0" data-city="Denpasar">Denpasar</button>
-            <button class="quick-city-pill px-3 py-1 rounded-full text-xs font-medium bg-slate-200/60 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 hover:bg-cyan-500 hover:text-white transition-all flex-shrink-0" data-city="Tokyo">Tokyo</button>
-        </div>
-
-        <!-- Navigation Tabs Bar -->
+        <!-- Navigation Tabs Bar (Segmented Control Architecture) -->
         <nav class="flex items-center gap-1.5 p-1.5 rounded-2xl glass-panel shadow-sm border border-slate-200/70 dark:border-slate-800/70 overflow-x-auto scrollbar-hide">
-            <button id="nav-dashboard" class="px-4 py-2 rounded-xl text-sm font-bold bg-cyan-500 text-white shadow-md shadow-cyan-500/25 flex items-center gap-2 transition-all">
-                <i class="fas fa-chart-line text-xs"></i>
+            <button id="nav-dashboard" class="px-4 py-2.5 rounded-xl text-sm font-bold bg-cyan-500 text-white shadow-md shadow-cyan-500/25 flex items-center gap-2 transition-all">
+                <i class="fas fa-gauge-high text-xs"></i>
                 <span>Dashboard Cuaca</span>
             </button>
-            <button id="nav-compare" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all">
-                <i class="fas fa-code-compare text-xs"></i>
+            <button id="nav-compare" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all">
+                <i class="fas fa-chart-line text-xs"></i>
                 <span>Komparasi Kota</span>
             </button>
-            <button id="nav-dsp" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all">
+            <button id="nav-dsp" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all">
                 <i class="fas fa-wave-square text-xs"></i>
                 <span>Laboratorium DSP</span>
             </button>
-            <button id="nav-raw-data" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all">
+            <button id="nav-raw-data" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 flex items-center gap-2 transition-all">
                 <i class="fas fa-table-list text-xs"></i>
                 <span>Data Mentah & CSV</span>
             </button>
         </nav>
 
+        <!-- Quick City Recommendations Chips -->
+        <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide py-0.5">
+            <span class="text-xs font-semibold text-slate-400 flex items-center gap-1.5 flex-shrink-0">
+                <i class="fas fa-location-dot text-cyan-500"></i> Populer:
+            </span>
+            <button class="quick-city-pill px-3.5 py-1.5 rounded-full text-xs font-medium glass-pill text-slate-700 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-all flex-shrink-0 shadow-sm" data-city="Bandung">Bandung</button>
+            <button class="quick-city-pill px-3.5 py-1.5 rounded-full text-xs font-medium glass-pill text-slate-700 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-all flex-shrink-0 shadow-sm" data-city="Jakarta">Jakarta</button>
+            <button class="quick-city-pill px-3.5 py-1.5 rounded-full text-xs font-medium glass-pill text-slate-700 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-all flex-shrink-0 shadow-sm" data-city="Surabaya">Surabaya</button>
+            <button class="quick-city-pill px-3.5 py-1.5 rounded-full text-xs font-medium glass-pill text-slate-700 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-all flex-shrink-0 shadow-sm" data-city="Yogyakarta">Yogyakarta</button>
+            <button class="quick-city-pill px-3.5 py-1.5 rounded-full text-xs font-medium glass-pill text-slate-700 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-all flex-shrink-0 shadow-sm" data-city="Denpasar">Denpasar</button>
+            <button class="quick-city-pill px-3.5 py-1.5 rounded-full text-xs font-medium glass-pill text-slate-700 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-all flex-shrink-0 shadow-sm" data-city="Tokyo">Tokyo</button>
+        </div>
+
         <!-- Global Alert Message -->
-        <div id="error-message" class="hidden p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-sm flex items-start gap-3 shadow-sm animate-fade-in" role="alert">
+        <div id="error-message" class="hidden p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-sm flex items-start gap-3 shadow-sm" role="alert">
             <i class="fas fa-triangle-exclamation text-base mt-0.5 flex-shrink-0"></i>
             <div>
                 <strong class="font-bold">Perhatian:</strong>
@@ -133,58 +124,44 @@
         </div>
 
         <!-- ========================================== -->
-        <!-- TAB 1: DASHBOARD UTAMA                     -->
+        <!-- TAB 1: DASHBOARD UTAMA (BALANCED BENTO)    -->
         <!-- ========================================== -->
         <section id="page-dashboard" class="space-y-6">
             
-            <!-- Hero Grid: Current Weather & Interactive Map -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Left: Cuaca Terkini (Hero Card) -->
-                <div class="lg:col-span-7 space-y-6">
-                    <div id="current-weather-card">
-                        <!-- Skeleton Placeholder -->
-                        <div class="rounded-2xl glass-panel p-8 animate-pulse space-y-4">
+            <!-- ROW 1: Hero Weather Master Card (Col 1-7) & Radar Map (Col 8-12) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <!-- Col 1-7: Cuaca Terkini Card -->
+                <div class="lg:col-span-7 h-full">
+                    <div id="current-weather-card" class="h-full">
+                        <!-- Skeleton Loader -->
+                        <div class="h-full rounded-3xl glass-panel p-7 animate-pulse space-y-6">
                             <div class="h-6 bg-slate-200 dark:bg-slate-800 rounded w-1/3"></div>
                             <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
                             <div class="grid grid-cols-4 gap-3 pt-4">
-                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+                                <div class="h-16 bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- 24-Jam Hourly Forecast Ribbon -->
-                    <div class="rounded-2xl glass-panel p-5 shadow-lg border border-slate-200/80 dark:border-slate-800/80 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                <i class="far fa-clock text-cyan-500"></i>
-                                Prakiraan 24 Jam Mendatang (Interval 3 Jam)
-                            </h3>
-                            <span class="text-xs text-slate-400 font-mono">Geser horizontal →</span>
-                        </div>
-                        <div id="hourly-cards-container" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide pt-1">
-                            <div class="text-xs text-slate-400 py-4 text-center w-full">Memuat data per jam...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Peta Interaktif OpenLayers -->
-                <div class="lg:col-span-5 space-y-6">
-                    <div class="rounded-2xl glass-panel p-5 shadow-lg border border-slate-200/80 dark:border-slate-800/80 space-y-3">
-                        <div class="flex items-center justify-between">
+                <!-- Col 8-12: Peta Radar Interaktif (Height-Matched & Dark-Mode Friendly) -->
+                <div class="lg:col-span-5 h-full">
+                    <div class="h-full flex flex-col justify-between rounded-3xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between pb-2">
                             <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <i class="fas fa-map-location-dot text-cyan-500"></i>
                                 Peta Radar Interaktif
                             </h3>
-                            <span class="text-[11px] text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-950 px-2 py-0.5 rounded-full font-medium">
+                            <span class="text-[11px] text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-950 px-2.5 py-0.5 rounded-full font-medium">
                                 Klik peta untuk cek cuaca
                             </span>
                         </div>
 
-                        <!-- OpenLayers Map View -->
-                        <div class="relative w-full h-[320px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900">
+                        <!-- OpenLayers Map View (Auto-Inverted in Dark Mode) -->
+                        <div class="relative w-full h-72 sm:h-80 flex-grow rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 shadow-inner">
                             <div id="map" class="w-full h-full"></div>
 
                             <!-- Popup Overlay OpenLayers -->
@@ -193,69 +170,101 @@
                                 <div id="popup-content"></div>
                             </div>
                         </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                            💡 <em>Tip:</em> Anda dapat mengklik titik mana saja di peta dunia untuk otomatis menarik data cuaca & analisis DSP lokasi tersebut.
-                        </p>
-                    </div>
 
-                    <!-- Prakiraan 5 Hari -->
-                    <div class="rounded-2xl glass-panel p-5 shadow-lg border border-slate-200/80 dark:border-slate-800/80 space-y-3">
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                            <i class="far fa-calendar-alt text-cyan-500"></i>
-                            Prakiraan 5 Hari Kedepan
-                        </h3>
-                        <div id="forecast-container" class="space-y-2">
-                            <div class="text-xs text-slate-400 py-4 text-center">Memuat perkiraan harian...</div>
-                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
+                            💡 <em>Tip:</em> Klik titik mana saja di peta untuk menarik otomatis data cuaca dan analisis sinyal lokasi tersebut.
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Bagian Bawah: Grafik Sinyal SMA & Analisis DSP -->
-            <div class="rounded-2xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-slate-800/60">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
-                                <i class="fas fa-chart-spline text-cyan-500 mr-1.5"></i>
-                                Analisis Sinyal Suhu & Filter SMA
-                            </h3>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-bold font-mono bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-400/30">
-                                FIR DSP
-                            </span>
+            <!-- ROW 2: 24-Jam Hourly Horizon Ribbon (FULL WIDTH 12-COL) -->
+            <div class="w-full rounded-3xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-slate-800/60">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="far fa-clock text-cyan-500"></i>
+                        Prakiraan 24 Jam Mendatang (Interval 3 Jam)
+                    </h3>
+                    <span class="text-xs text-slate-400 font-mono flex items-center gap-1">
+                        <span>Horizon Waktu</span>
+                        <i class="fas fa-arrow-right text-[10px]"></i>
+                    </span>
+                </div>
+                
+                <!-- 8 Hourly Cards Container (Spacious across 100% width) -->
+                <div id="hourly-cards-container" class="flex gap-3.5 overflow-x-auto pb-2 scrollbar-hide pt-1">
+                    <div class="text-xs text-slate-400 py-6 text-center w-full">Memuat data per jam...</div>
+                </div>
+            </div>
+
+            <!-- ROW 3: Side-by-Side Analytics Chart (Col 1-7) & 5-Day Outlook (Col 8-12) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                <!-- Col 1-7: Grafik Sinyal SMA & Analisis DSP -->
+                <div class="lg:col-span-7 h-full">
+                    <div class="h-full flex flex-col justify-between rounded-3xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/60 dark:border-slate-800/60">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
+                                        <i class="fas fa-chart-spline text-cyan-500 mr-1.5"></i>
+                                        Sinyal Suhu & Filter SMA
+                                    </h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[11px] font-bold font-mono bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300 border border-amber-400/30">
+                                        FIR Low-Pass
+                                    </span>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                    Peredaman fluktuasi transien menggunakan Simple Moving Average.
+                                </p>
+                            </div>
+
+                            <!-- Filter Control Toolbar -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/60">
+                                    <label for="sma-window-size" class="text-xs font-semibold text-slate-600 dark:text-slate-400">Window M:</label>
+                                    <select id="sma-window-size" class="bg-transparent text-xs font-bold text-cyan-600 dark:text-cyan-400 focus:outline-none cursor-pointer pr-1">
+                                        <option value="3" class="dark:bg-slate-800">3 (9 Jam)</option>
+                                        <option value="4" selected class="dark:bg-slate-800">4 (12 Jam)</option>
+                                        <option value="5" class="dark:bg-slate-800">5 (15 Jam)</option>
+                                        <option value="6" class="dark:bg-slate-800">6 (18 Jam)</option>
+                                    </select>
+                                </div>
+
+                                <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 cursor-pointer hover:border-amber-500/50 transition-colors">
+                                    <input type="checkbox" id="toggle-sma" checked class="w-3.5 h-3.5 rounded text-amber-500 focus:ring-amber-500 bg-slate-200 dark:bg-slate-900 border-slate-300 dark:border-slate-700">
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Filter SMA</span>
+                                </label>
+
+                                <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 cursor-pointer hover:border-emerald-500/50 transition-colors">
+                                    <input type="checkbox" id="toggle-ema" class="w-3.5 h-3.5 rounded text-emerald-500 focus:ring-emerald-500 bg-slate-200 dark:bg-slate-900 border-slate-300 dark:border-slate-700">
+                                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Filter EMA</span>
+                                </label>
+                            </div>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                            Visualisasi peredaman fluktuasi (noise) temperatur menggunakan Simple Moving Average.
-                        </p>
-                    </div>
 
-                    <!-- Filter Control Toolbar -->
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/60">
-                            <label for="sma-window-size" class="text-xs font-semibold text-slate-600 dark:text-slate-300">Window M:</label>
-                            <select id="sma-window-size" class="bg-transparent text-xs font-bold text-cyan-600 dark:text-cyan-400 focus:outline-none cursor-pointer">
-                                <option value="3" class="dark:bg-slate-800">3 (9 Jam)</option>
-                                <option value="4" selected class="dark:bg-slate-800">4 (12 Jam)</option>
-                                <option value="5" class="dark:bg-slate-800">5 (15 Jam)</option>
-                                <option value="6" class="dark:bg-slate-800">6 (18 Jam)</option>
-                            </select>
+                        <!-- Canvas Chart Container -->
+                        <div class="relative h-72 sm:h-80 w-full pt-1 flex-grow">
+                            <canvas id="hourlyTrendChart"></canvas>
                         </div>
-
-                        <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-                            <input type="checkbox" id="toggle-sma" checked class="w-4 h-4 rounded text-amber-500 focus:ring-amber-500 bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700">
-                            <span>Tampilkan SMA (Kuning)</span>
-                        </label>
-
-                        <label class="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
-                            <input type="checkbox" id="toggle-ema" class="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700">
-                            <span>EMA IIR (Hijau)</span>
-                        </label>
                     </div>
                 </div>
 
-                <!-- Canvas Chart -->
-                <div class="relative h-80 w-full pt-2">
-                    <canvas id="hourlyTrendChart"></canvas>
+                <!-- Col 8-12: Prakiraan 5 Hari (With Precise Column Grid Alignment) -->
+                <div class="lg:col-span-5 h-full">
+                    <div class="h-full flex flex-col justify-between rounded-3xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-slate-800/60">
+                            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="far fa-calendar-alt text-cyan-500"></i>
+                                Prakiraan 5 Hari Kedepan
+                            </h3>
+                            <span class="text-xs text-slate-400 font-mono">Rentang Suhu</span>
+                        </div>
+
+                        <!-- Forecast Rows Container -->
+                        <div id="forecast-container" class="space-y-2.5 flex-grow flex flex-col justify-between pt-1">
+                            <div class="text-xs text-slate-400 py-6 text-center">Memuat perkiraan harian...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -264,11 +273,11 @@
         <!-- TAB 2: KOMPARASI MULTI KOTA                -->
         <!-- ========================================== -->
         <section id="page-compare" class="hidden space-y-6">
-            <div class="rounded-2xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-6">
+            <div class="rounded-3xl glass-panel p-6 sm:p-7 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-slate-800/60">
                     <div>
                         <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
-                            <i class="fas fa-code-compare text-cyan-500"></i>
+                            <i class="fas fa-chart-line text-cyan-500"></i>
                             Komparasi Tren Cuaca Antar Kota
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -289,7 +298,7 @@
                     </div>
                 </div>
 
-                <!-- Input Tambah Kota & Tags -->
+                <!-- Input Tambah Kota & Action Button -->
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <div class="flex-grow flex gap-2">
                         <input type="text" id="compare-city-input" placeholder="Tambah nama kota (cth: Medan, Tokyo)..."
@@ -300,8 +309,8 @@
                         </button>
                     </div>
                     <button id="btn-run-compare"
-                            class="px-5 py-2.5 rounded-xl text-sm font-bold bg-cyan-500 hover:bg-cyan-600 text-white shadow-md shadow-cyan-500/25 transition-all">
-                        <i class="fas fa-arrows-rotate mr-1.5"></i> Perbarui Komparasi
+                            class="px-5 py-2.5 rounded-xl text-sm font-bold bg-cyan-500 hover:bg-cyan-600 text-white shadow-md shadow-cyan-500/25 transition-all flex items-center justify-center gap-1.5">
+                        <i class="fas fa-arrows-rotate mr-1"></i> Perbarui Komparasi
                     </button>
                 </div>
 
@@ -322,7 +331,7 @@
         <!-- TAB 3: LABORATORIUM DSP & PSD              -->
         <!-- ========================================== -->
         <section id="page-dsp" class="hidden space-y-6">
-            <div class="rounded-2xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-6">
+            <div class="rounded-3xl glass-panel p-6 sm:p-7 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-6">
                 <div>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-bold font-mono uppercase bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300/30">
                         Mata Kuliah: Pengolahan Sinyal Digital (PSD)
@@ -345,7 +354,7 @@
                             <i class="fas fa-square-root-variable text-cyan-500"></i>
                             Formula Matematis FIR Filter (SMA)
                         </h4>
-                        <div class="p-3 rounded-xl bg-white dark:bg-slate-950 font-mono text-xs text-cyan-600 dark:text-cyan-400 border border-slate-200/60 dark:border-slate-800">
+                        <div class="p-3.5 rounded-xl bg-white dark:bg-slate-950 font-mono text-xs text-cyan-600 dark:text-cyan-400 border border-slate-200/60 dark:border-slate-800">
                             y[n] = (1 / M) * &sum;<sub>k=0</sub><sup>M-1</sup> x[n - k]
                         </div>
                         <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 leading-relaxed">
@@ -363,8 +372,8 @@
                         <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                             Filter rata-rata bergerak memiliki fungsi transfer $H(z) = \frac{1}{M} \sum_{k=0}^{M-1} z^{-k}$. Respon magnitudo berbentuk fungsi Dirichlet sinc yang meloloskan komponen frekuensi rendah (tren iklim harian) dan meredam fluktuasi transien (noise hembusan angin/turbulensi termal).
                         </p>
-                        <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300/30 text-emerald-700 dark:text-emerald-300 text-xs">
-                            <i class="fas fa-check-circle mr-1"></i> Terbukti mengurangi standar deviasi fluktuasi suhu sebesar rata-rata 40-70%.
+                        <div class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
+                            <i class="fas fa-check-circle mr-1"></i> Terbukti mengurangi fluktuasi standar deviasi suhu sebesar rata-rata 35-70%.
                         </div>
                     </div>
                 </div>
@@ -375,7 +384,7 @@
         <!-- TAB 4: DATA MENTAH & EXPORT CSV            -->
         <!-- ========================================== -->
         <section id="page-raw-data" class="hidden space-y-6">
-            <div class="rounded-2xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-6">
+            <div class="rounded-3xl glass-panel p-6 sm:p-7 shadow-xl border border-slate-200/80 dark:border-slate-800/80 space-y-6">
                 <!-- Toolbar Data Mentah -->
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/60 dark:border-slate-800/60">
                     <div>
@@ -386,11 +395,11 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Radio Toggle Hourly vs Daily -->
                         <div class="inline-flex rounded-xl p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                            <label class="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors has-[:checked]:bg-cyan-500 has-[:checked]:text-white text-slate-600 dark:text-slate-300">
+                            <label class="px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors has-[:checked]:bg-cyan-500 has-[:checked]:text-white text-slate-600 dark:text-slate-300">
                                 <input type="radio" name="raw-type" value="hourly" checked class="hidden">
                                 Per Jam (Hourly)
                             </label>
-                            <label class="px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors has-[:checked]:bg-cyan-500 has-[:checked]:text-white text-slate-600 dark:text-slate-300">
+                            <label class="px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-colors has-[:checked]:bg-cyan-500 has-[:checked]:text-white text-slate-600 dark:text-slate-300">
                                 <input type="radio" name="raw-type" value="daily" class="hidden">
                                 Harian (Daily)
                             </label>
@@ -406,7 +415,7 @@
                 </div>
 
                 <!-- Filter Checkboxes Parameter -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
                     <fieldset id="hourly-filters" class="space-y-2">
                         <legend class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Parameter Per Jam</legend>
                         <div class="flex flex-wrap gap-3">
@@ -449,7 +458,7 @@
                 </div>
 
                 <!-- Table Container -->
-                <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                <div class="overflow-x-auto rounded-2xl border border-slate-200 dark:border-slate-800">
                     <table id="raw-data-table" class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
                         <thead id="raw-table-head" class="bg-slate-100/80 dark:bg-slate-900/80"></thead>
                         <tbody id="raw-table-body" class="bg-white/50 dark:bg-slate-900/30 divide-y divide-slate-100 dark:divide-slate-800"></tbody>

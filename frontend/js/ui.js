@@ -36,13 +36,10 @@ export function getWeatherMeta(weatherId) {
 // Global Chart Instances
 let smaChart = null;
 let compareChart = null;
-let dspResidualChart = null;
 
 // --- Seleksi Elemen DOM ---
 const cityInput = document.getElementById('city-input');
 const fetchButton = document.getElementById('fetch-button');
-const buttonText = document.getElementById('button-text');
-const buttonSpinner = document.getElementById('button-spinner');
 const errorMessageDiv = document.getElementById('error-message');
 const errorTextSpan = document.getElementById('error-text');
 
@@ -63,12 +60,15 @@ export function setCityInput(city) {
 export function setButtonLoading(isLoading) {
     if (!fetchButton) return;
     fetchButton.disabled = isLoading;
+    const buttonText = document.getElementById('button-text');
+    const buttonIcon = document.getElementById('button-icon');
+
     if (isLoading) {
-        if (buttonText) buttonText.textContent = "Memproses...";
-        if (buttonSpinner) buttonSpinner.classList.remove('hidden');
+        if (buttonText) buttonText.textContent = "Mencari...";
+        if (buttonIcon) buttonIcon.className = "fas fa-circle-notch fa-spin text-xs";
     } else {
-        if (buttonText) buttonText.textContent = "Cari Cuaca";
-        if (buttonSpinner) buttonSpinner.classList.add('hidden');
+        if (buttonText) buttonText.textContent = "Cari";
+        if (buttonIcon) buttonIcon.className = "fas fa-search text-xs";
     }
 }
 
@@ -111,6 +111,7 @@ export function renderCurrentWeather(data) {
     const weatherDesc = current.weather_desc || (data.hourly?.weather_desc?.[0] || 'Cerah');
     const weatherMeta = getWeatherMeta(weatherId);
     const noiseReduction = data.dsp?.noise_reduction_pct || 0;
+    const smaWindow = data.dsp?.sma_window || 4;
 
     const now = new Date();
     const dateFormatted = now.toLocaleDateString('id-ID', {
@@ -122,93 +123,92 @@ export function renderCurrentWeather(data) {
     const timeFormatted = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
     currentWeatherCard.innerHTML = `
-        <div class="relative overflow-hidden rounded-2xl glass-panel p-6 shadow-xl border border-slate-200/80 dark:border-slate-800/80 transition-all duration-300">
-            <!-- Ambient Gradient Orb -->
-            <div class="absolute -right-16 -top-16 w-56 h-56 bg-cyan-500/10 dark:bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="h-full flex flex-col justify-between rounded-3xl glass-panel p-6 sm:p-7 shadow-xl border border-slate-200/80 dark:border-slate-800/80 relative overflow-hidden transition-all duration-300">
+            <!-- Subtle Ambient Light Orb -->
+            <div class="absolute -right-12 -top-12 w-48 h-48 bg-cyan-500/10 dark:bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
-            <!-- Top Bar: Info Kota & Waktu -->
-            <div class="flex flex-wrap items-center justify-between gap-2 pb-5 border-b border-slate-200/60 dark:border-slate-800/60">
+            <!-- Header Info -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200/60 dark:border-slate-800/60">
                 <div>
                     <div class="flex items-center gap-2">
                         <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">${city}${country}</h2>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-100 dark:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 border border-cyan-300/40">
-                            Live GPS
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border border-cyan-400/30">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping"></span>
+                            Live Data
                         </span>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${dateFormatted} • Terakhir diperbarui: ${timeFormatted}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${dateFormatted} • Update: ${timeFormatted}</p>
                 </div>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 text-xs font-mono">
-                    <i class="fas fa-satellite-dish text-cyan-500 animate-pulse"></i>
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/70 text-slate-700 dark:text-slate-300 text-xs font-mono border border-slate-200/60 dark:border-slate-700/60">
+                    <i class="fas fa-location-crosshairs text-cyan-500"></i>
                     <span>${data.lat?.toFixed(3)}°, ${data.lon?.toFixed(3)}°</span>
                 </div>
             </div>
 
-            <!-- Main Weather Display -->
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 my-6 items-center">
-                <div class="md:col-span-7 flex items-center gap-6">
-                    <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0 shadow-inner">
-                        <i class="${weatherMeta.icon} ${weatherMeta.color} text-5xl filter drop-shadow"></i>
+            <!-- Hero Temperature & Main Condition -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-6 my-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-500/15 to-blue-500/15 dark:from-cyan-500/20 dark:to-blue-600/20 flex items-center justify-center border border-cyan-500/20 shadow-inner flex-shrink-0">
+                        <i class="${weatherMeta.icon} ${weatherMeta.color} text-4xl filter drop-shadow"></i>
                     </div>
                     <div>
                         <div class="flex items-baseline gap-1">
-                            <span class="text-6xl md:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tighter tabular-nums">${temp}</span>
+                            <span class="text-6xl sm:text-7xl font-extrabold text-slate-900 dark:text-white tracking-tighter tabular-nums">${temp}</span>
                             <span class="text-3xl font-light text-cyan-600 dark:text-cyan-400">°C</span>
                         </div>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-base font-semibold capitalize text-slate-800 dark:text-slate-200">${weatherDesc}</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-base font-bold capitalize text-slate-800 dark:text-slate-200">${weatherDesc}</span>
                             <span class="text-xs text-slate-400">• Terasa ${feelsLike}°C</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- DSP Status Pill -->
-                <div class="md:col-span-5 flex flex-col justify-center">
-                    <div class="p-3.5 rounded-xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 dark:border-amber-400/20">
-                        <div class="flex items-center justify-between text-xs mb-1">
-                            <span class="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                                <i class="fas fa-wave-square"></i> Filter Digital SMA (PSD)
-                            </span>
-                            <span class="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">Aktif</span>
-                        </div>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                            Algoritma Moving Average window <strong class="text-slate-800 dark:text-slate-200">M = ${data.dsp?.sma_window || 4}</strong> meredam <strong class="text-emerald-500">${noiseReduction}%</strong> fluktuasi sinyal temperatur.
-                        </p>
+                <!-- Sleek DSP Filter Status Pill -->
+                <div class="w-full sm:w-auto p-3.5 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 text-xs">
+                    <div class="flex items-center justify-between gap-3 font-semibold text-amber-600 dark:text-amber-400 mb-1">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fas fa-wave-square"></i> Filter Digital SMA (FIR)
+                        </span>
+                        <span class="font-mono text-emerald-500 font-bold">M=${smaWindow}</span>
                     </div>
+                    <p class="text-slate-600 dark:text-slate-400 leading-snug text-[11px]">
+                        Meredam <strong class="text-emerald-500 font-bold">${noiseReduction}%</strong> fluktuasi transien suhu cuaca.
+                    </p>
                 </div>
             </div>
 
-            <!-- Quick Metrics Grid -->
+            <!-- 4 Balanced Metric Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-200/60 dark:border-slate-800/60">
-                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/40">
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:border-cyan-500/40 transition-colors">
                     <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <i class="fas fa-droplet text-blue-500"></i>
                         <span>Kelembapan</span>
                     </div>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white mt-1 tabular-nums">${humidity}%</p>
+                    <p class="text-lg font-extrabold text-slate-900 dark:text-white mt-1.5 tabular-nums">${humidity}%</p>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/40">
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:border-cyan-500/40 transition-colors">
                     <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <i class="fas fa-wind text-cyan-500"></i>
                         <span>Kecepatan Angin</span>
                     </div>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white mt-1 tabular-nums">${windSpeed} <span class="text-xs font-normal">km/j</span></p>
+                    <p class="text-lg font-extrabold text-slate-900 dark:text-white mt-1.5 tabular-nums">${windSpeed} <span class="text-xs font-normal text-slate-400">km/j</span></p>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/40">
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:border-cyan-500/40 transition-colors">
                     <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <i class="fas fa-gauge-high text-emerald-500"></i>
                         <span>Tekanan Udara</span>
                     </div>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white mt-1 tabular-nums">${pressure} <span class="text-xs font-normal">hPa</span></p>
+                    <p class="text-lg font-extrabold text-slate-900 dark:text-white mt-1.5 tabular-nums">${pressure} <span class="text-xs font-normal text-slate-400">hPa</span></p>
                 </div>
 
-                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/40">
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:border-cyan-500/40 transition-colors">
                     <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <i class="fas fa-eye text-indigo-500"></i>
                         <span>Jarak Pandang</span>
                     </div>
-                    <p class="text-lg font-bold text-slate-900 dark:text-white mt-1 tabular-nums">${visibility} <span class="text-xs font-normal">km</span></p>
+                    <p class="text-lg font-extrabold text-slate-900 dark:text-white mt-1.5 tabular-nums">${visibility} <span class="text-xs font-normal text-slate-400">km</span></p>
                 </div>
             </div>
         </div>
@@ -216,12 +216,12 @@ export function renderCurrentWeather(data) {
     currentWeatherCard.classList.remove('hidden');
 }
 
-// --- Render Kartu Per Jam (Hourly 24 Jam) ---
+// --- Render Prakiraan 24 Jam (Full-Width Ribbon) ---
 export function renderHourlyCards(hourlyData) {
     if (!hourlyCardsContainer || !hourlyData || !hourlyData.time) return;
 
     hourlyCardsContainer.innerHTML = '';
-    const sliceCount = 8; // 24 jam ke depan (interval 3 jam)
+    const sliceCount = 8; // 24 Jam (8 interval x 3 jam)
     const hours = hourlyData.time.slice(0, sliceCount);
 
     hours.forEach((time, index) => {
@@ -234,30 +234,29 @@ export function renderHourlyCards(hourlyData) {
         const pop = hourlyData.pop?.[index] ?? 0;
 
         const card = document.createElement('div');
-        card.className = "flex-shrink-0 w-28 p-3.5 rounded-2xl glass-panel text-center border border-slate-200/70 dark:border-slate-800/70 hover:border-cyan-500 dark:hover:border-cyan-400 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md";
+        card.className = "flex-1 min-w-[105px] p-4 rounded-2xl glass-panel text-center border border-slate-200/70 dark:border-slate-800/70 hover:border-cyan-500 dark:hover:border-cyan-400 transition-all duration-200 group cursor-default shadow-sm hover:shadow-md hover:-translate-y-1";
         card.innerHTML = `
-            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">${timePart}</p>
-            <div class="w-10 h-10 mx-auto rounded-full bg-slate-100 dark:bg-slate-800/60 flex items-center justify-center my-1.5 group-hover:scale-110 transition-transform">
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">${timePart}</p>
+            <div class="w-11 h-11 mx-auto rounded-full bg-slate-100 dark:bg-slate-800/70 flex items-center justify-center my-2 group-hover:scale-110 transition-transform shadow-inner">
                 <i class="${iconMeta.icon} ${iconMeta.color} text-lg"></i>
             </div>
             <p class="text-xl font-extrabold text-slate-900 dark:text-white tabular-nums">${temp}°</p>
-            <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 font-mono">
-                <span title="Peluang Hujan"><i class="fas fa-droplet text-cyan-500 text-[10px]"></i> ${pop}%</span>
-                <span title="Nilai Filter SMA" class="text-amber-500 font-semibold">${smaTemp}</span>
+            <div class="mt-2.5 pt-2 border-t border-slate-200/50 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+                <span title="Peluang Presipitasi"><i class="fas fa-droplet text-cyan-500 text-[10px]"></i> ${pop}%</span>
+                <span title="Hasil Filter SMA" class="text-amber-500 font-semibold">${smaTemp}</span>
             </div>
         `;
         hourlyCardsContainer.appendChild(card);
     });
 }
 
-// --- Render Prakiraan 5 Hari ---
+// --- Render Prakiraan 5 Hari (Aligned iOS-style Rows) ---
 export function renderForecast5Day(dailyData) {
     if (!forecastContainer || !dailyData || !dailyData.time) return;
 
     forecastContainer.innerHTML = '';
     const days = dailyData.time.slice(0, 5);
 
-    // Hitung range suhu global untuk visual range bar
     const allMax = Math.max(...dailyData.temperature_2m_max);
     const allMin = Math.min(...dailyData.temperature_2m_min);
     const rangeSpan = Math.max(1, allMax - allMin);
@@ -269,48 +268,43 @@ export function renderForecast5Day(dailyData) {
         const iconMeta = getWeatherMeta(dailyData.weather_id[index]);
         const maxTemp = Math.round(dailyData.temperature_2m_max[index]);
         const minTemp = Math.round(dailyData.temperature_2m_min[index]);
-        const rainSum = dailyData.precipitation_sum?.[index] ?? 0;
 
-        // Persentase posisi bar gradien suhu
         const leftPercent = Math.max(0, Math.min(100, ((minTemp - allMin) / rangeSpan) * 100));
         const widthPercent = Math.max(15, Math.min(100 - leftPercent, ((maxTemp - minTemp) / rangeSpan) * 100));
 
         const item = document.createElement('div');
-        item.className = "flex items-center justify-between p-3 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-800 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-colors";
+        item.className = "flex items-center p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800/60 hover:bg-slate-100/80 dark:hover:bg-slate-800/50 transition-colors";
         item.innerHTML = `
-            <div class="w-24">
+            <!-- Day & Date Column (Fixed Width) -->
+            <div class="w-24 flex-shrink-0">
                 <span class="block font-bold text-sm text-slate-900 dark:text-slate-100">${dayName}</span>
-                <span class="text-[11px] text-slate-500 dark:text-slate-400">${dateFormatted}</span>
+                <span class="text-[11px] text-slate-400">${dateFormatted}</span>
             </div>
 
-            <div class="flex items-center gap-2 w-28">
+            <!-- Weather Condition Column (Fixed Width) -->
+            <div class="w-36 flex-shrink-0 flex items-center gap-2">
                 <i class="${iconMeta.icon} ${iconMeta.color} text-lg w-6 text-center"></i>
                 <span class="text-xs text-slate-600 dark:text-slate-300 font-medium truncate">${iconMeta.label}</span>
             </div>
 
-            <!-- Temperature Range Bar -->
-            <div class="hidden sm:flex items-center gap-2 flex-grow max-w-[140px] mx-3">
-                <span class="text-xs text-slate-400 tabular-nums">${minTemp}°</span>
-                <div class="relative flex-grow h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                    <div class="absolute h-full rounded-full bg-gradient-to-r from-cyan-400 to-amber-500" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
+            <!-- Aligned Temperature Range Gradient Bar (Flexible Width) -->
+            <div class="flex-grow flex items-center gap-2 mx-4">
+                <span class="text-xs text-slate-400 tabular-nums font-mono w-6 text-right">${minTemp}°</span>
+                <div class="relative flex-grow h-2 bg-slate-200 dark:bg-slate-700/80 rounded-full overflow-hidden">
+                    <div class="absolute h-full rounded-full bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-500" style="left: ${leftPercent}%; width: ${widthPercent}%;"></div>
                 </div>
-                <span class="text-xs font-bold text-slate-700 dark:text-slate-200 tabular-nums">${maxTemp}°</span>
-            </div>
-
-            <div class="text-right sm:hidden">
-                <span class="text-xs font-bold text-slate-800 dark:text-white tabular-nums">${maxTemp}°</span>
-                <span class="text-xs text-slate-400 tabular-nums"> / ${minTemp}°</span>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200 tabular-nums font-mono w-6">${maxTemp}°</span>
             </div>
         `;
         forecastContainer.appendChild(item);
     });
 }
 
-// --- Render Grafik SMA & DSP (Pengolahan Sinyal Digital) ---
+// --- Render Grafik SMA & DSP ---
 export function renderSMAChart(hourlyData) {
     if (!hourlyTrendChartCanvas || !hourlyData || !hourlyData.time || !hourlyData.temperature_2m) return;
 
-    const sliceCount = 8; // 24 Jam
+    const sliceCount = 8;
     const labels = hourlyData.time.slice(0, sliceCount).map(t => t.split(' ')[1].substring(0, 5));
     const dataActual = hourlyData.temperature_2m.slice(0, sliceCount);
     const dataSMA = (hourlyData.temperature_sma || []).slice(0, sliceCount);
@@ -325,8 +319,6 @@ export function renderSMAChart(hourlyData) {
     }
 
     const ctx = hourlyTrendChartCanvas.getContext('2d');
-
-    // Buat Gradient untuk area sinyal
     const gradientActual = ctx.createLinearGradient(0, 0, 0, 260);
     if (isDark) {
         gradientActual.addColorStop(0, 'rgba(6, 182, 212, 0.35)');
@@ -520,7 +512,6 @@ export function renderComparisonChart(dataObject, parameter = 'temperature_2m_ma
         }
     });
 
-    // Render Summary Cards Komparasi
     renderComparisonSummaryCards(dataObject, parameter);
 }
 
@@ -537,7 +528,7 @@ function renderComparisonSummaryCards(dataObject, parameter) {
         const min = values.length > 0 ? Math.min(...values) : '-';
 
         const card = document.createElement('div');
-        card.className = "p-4 rounded-xl glass-panel border border-slate-200/70 dark:border-slate-800/70 shadow-sm";
+        card.className = "p-4 rounded-2xl glass-panel border border-slate-200/70 dark:border-slate-800/70 shadow-sm";
         card.innerHTML = `
             <div class="flex items-center justify-between mb-2">
                 <span class="font-bold text-slate-900 dark:text-white text-base">${c.cityName || city}</span>
@@ -562,7 +553,7 @@ function renderComparisonSummaryCards(dataObject, parameter) {
     }
 }
 
-// --- Render Laboratorium DSP (Analisis Sinyal) ---
+// --- Render Laboratorium DSP ---
 export function renderDSPLab(hourlyData) {
     const container = document.getElementById('dsp-analysis-content');
     if (!container || !hourlyData || !hourlyData.temperature_2m) return;
@@ -585,29 +576,29 @@ export function renderDSPLab(hourlyData) {
 
     container.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="p-4 rounded-xl glass-panel border border-cyan-500/30">
+            <div class="p-5 rounded-2xl glass-panel border border-cyan-500/30">
                 <span class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block">Sinyal Masukan Asli x[n]</span>
-                <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">${rawDelta}°C <span class="text-xs font-normal text-slate-400">Rentang Fluktuasi</span></p>
-                <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 space-y-1 font-mono">
+                <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1.5 tabular-nums">${rawDelta}°C <span class="text-xs font-normal text-slate-400">Rentang Fluktuasi</span></p>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-2.5 space-y-1 font-mono">
                     <div>Rata-rata: ${rawMean}°C</div>
                     <div>Min / Max: ${rawMin}°C / ${rawMax}°C</div>
                 </div>
             </div>
 
-            <div class="p-4 rounded-xl glass-panel border border-amber-500/30">
+            <div class="p-5 rounded-2xl glass-panel border border-amber-500/30">
                 <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Sinyal Hasil Filter y[n]</span>
-                <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1 tabular-nums">${smaDelta}°C <span class="text-xs font-normal text-slate-400">Rentang Halus</span></p>
-                <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 space-y-1 font-mono">
+                <p class="text-2xl font-extrabold text-slate-900 dark:text-white mt-1.5 tabular-nums">${smaDelta}°C <span class="text-xs font-normal text-slate-400">Rentang Halus</span></p>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-2.5 space-y-1 font-mono">
                     <div>Rata-rata: ${smaMean}°C</div>
                     <div>Min / Max: ${smaMin}°C / ${smaMax}°C</div>
                 </div>
             </div>
 
-            <div class="p-4 rounded-xl glass-panel border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-transparent">
+            <div class="p-5 rounded-2xl glass-panel border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-transparent">
                 <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Efisiensi Reduksi Noise</span>
-                <p class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">${noiseReduction}%</p>
+                <p class="text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1.5 tabular-nums">${noiseReduction}%</p>
                 <p class="text-xs text-slate-600 dark:text-slate-300 mt-2">
-                    Filter Low-Pass FIR berhasil meredam fluktuasi frekuensi tinggi sinyal cuaca.
+                    Filter Low-Pass FIR berhasil meredam fluktuasi transien frekuensi tinggi sinyal cuaca.
                 </p>
             </div>
         </div>
@@ -649,12 +640,10 @@ export function renderRawDataTable(dataObject, type = 'hourly', selectedFilters 
     const availableParams = Object.keys(dataObject);
     const visibleParams = ['time', ...selectedFilters.filter(p => p !== 'weather_id' && availableParams.includes(p))];
     
-    // Sertakan SMA jika tersedia
     if (type === 'hourly' && availableParams.includes('temperature_sma') && !visibleParams.includes('temperature_sma')) {
         visibleParams.push('temperature_sma');
     }
 
-    // Build Header
     let headerHTML = `<th class="px-5 py-3.5 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Kondisi</th>`;
     visibleParams.forEach(param => {
         const title = HEADER_NAME_MAP[param] || param;
@@ -662,7 +651,6 @@ export function renderRawDataTable(dataObject, type = 'hourly', selectedFilters 
     });
     rawTableHead.innerHTML = `<tr>${headerHTML}</tr>`;
 
-    // Build Rows
     const numRows = dataObject.time.length;
     for (let i = 0; i < numRows; i++) {
         const weatherId = dataObject.weather_id?.[i] || 800;

@@ -94,3 +94,4 @@ Aplikasi Prediksi Cuaca/
   ```bash
   npm run dev
   ```
+
